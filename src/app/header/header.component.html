@@ -1,0 +1,11 @@
+<!-- src/app/header/header.component.html -->
+<!-- Example in header.component.html -->
+<nav class="navbar">
+  <ul>
+    <li><a routerLink="/appointments" routerLinkActive="active">List Appointments</a></li>
+    <li *ngIf="userService.currentRole === 'RECEPTIONIST' || userService.currentRole === 'ADMIN'">
+      <a routerLink="/add-appointment" routerLinkActive="active">Add Appointment</a>
+    </li>
+    <li><a (click)="logout()" style="cursor:pointer;">Sign Out</a></li>
+  </ul>
+</nav>

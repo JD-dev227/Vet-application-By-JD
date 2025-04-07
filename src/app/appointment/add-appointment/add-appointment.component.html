@@ -1,0 +1,103 @@
+<div class="form-container">
+    <h2>Add Appointment</h2>
+    <form [formGroup]="appointmentForm" (ngSubmit)="submitForm()">
+      <div class="form-group">
+        <label>Patient Name:</label>
+        <input type="text" formControlName="patientName" />
+        <div class="error" *ngIf="appointmentForm.get('patientName')?.invalid && appointmentForm.get('patientName')?.touched">
+          Patient name is required.
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label>Animal Type:</label>
+        <select formControlName="animalType">
+          <option value="">Select</option>
+          <option value="Dog">Dog</option>
+          <option value="Cat">Cat</option>
+          <option value="Rabbit">Rabbit</option>
+          <option value="Bird">Bird</option>
+          <option value="Reptile">Reptile</option>
+        </select>
+        <div class="error" *ngIf="appointmentForm.get('animalType')?.invalid && appointmentForm.get('animalType')?.touched">
+          Animal type is required.
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label>Owner ID Card Number:</label>
+        <input type="text" formControlName="ownerIdCardNumber" />
+        <div class="error" *ngIf="appointmentForm.get('ownerIdCardNumber')?.invalid && appointmentForm.get('ownerIdCardNumber')?.touched">
+          Owner ID card number is required and must be numeric ending with a letter.
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label>Owner Name:</label>
+        <input type="text" formControlName="ownerName" />
+        <div class="error" *ngIf="appointmentForm.get('ownerName')?.invalid && appointmentForm.get('ownerName')?.touched">
+          Owner name is required.
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label>Owner Surname:</label>
+        <input type="text" formControlName="ownerSurname" />
+        <div class="error" *ngIf="appointmentForm.get('ownerSurname')?.invalid && appointmentForm.get('ownerSurname')?.touched">
+          Owner surname is required.
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label>Owner Contact Number:</label>
+        <input type="text" formControlName="ownerContactNumber" />
+        <div class="error" *ngIf="appointmentForm.get('ownerContactNumber')?.invalid && appointmentForm.get('ownerContactNumber')?.touched">
+          Owner contact number is required and must be at least 8 digits.
+        </div>
+      </div>
+    
+      <div class="form-group">
+        <label>Appointment Date:</label>
+        <input type="date" formControlName="appointmentDate" />
+        <div class="error" *ngIf="appointmentForm.get('appointmentDateTime')?.errors?.['pastDateTime'] && appointmentForm.get('appointmentDateTime')?.touched">
+            Appointment date and time must be in the future.
+          </div>
+      </div>
+      <div class="form-group">
+        <label>Appointment Time:</label>
+        <input type="time" formControlName="appointmentTime" />
+     
+        <div class="error" *ngIf="appointmentForm.get('appointmentDateTime')?.errors?.['pastDateTime'] && appointmentForm.get('appointmentDateTime')?.touched">
+            Appointment date and time must be in the future.
+          </div>
+      </div>
+      <div class="form-group">
+        <label>Appointment Duration (in minutes):</label>
+        <select formControlName="appointmentDuration">
+          <option value="">Select</option>
+          <option [value]="10">10</option>
+          <option [value]="15">15</option>
+          <option [value]="30">30</option>
+        </select>
+        <div class="error" *ngIf="appointmentForm.get('appointmentDuration')?.invalid && appointmentForm.get('appointmentDuration')?.touched">
+          Appointment duration is required.
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label>Reason for Appointment:</label>
+        <textarea formControlName="reasonForAppointment"></textarea>
+        <div class="error" *ngIf="appointmentForm.get('reasonForAppointment')?.invalid && appointmentForm.get('reasonForAppointment')?.touched">
+          Reason for appointment is required.
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label>Vet Notes:</label>
+        <textarea formControlName="vetNotes" [disabled]="userRole === 'RECEPTIONIST'"></textarea>
+      </div>
+  
+      <button type="submit" class="submit-btn" [disabled]="appointmentForm.invalid">Submit</button>
+    </form>
+  </div>
+  

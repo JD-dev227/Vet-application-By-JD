@@ -1,0 +1,19 @@
+<div class="details-container" *ngIf="appointment; else loading">
+    <h2>Appointment Details (ID: {{ appointment.appointmentId }})</h2>
+    <p><strong>Patient Name:</strong> {{ appointment.patientName }}</p>
+    <p><strong>Animal Type:</strong> {{ appointment.animalType }}</p>
+    <p><strong>Owner ID Card Number:</strong> {{ appointment.ownerIdCardNumber }}</p>
+    <p><strong>Owner Name:</strong> {{ appointment.ownerName }}</p>
+    <p><strong>Owner Surname:</strong> {{ appointment.ownerSurname }}</p>
+    <p><strong>Owner Contact Number:</strong> {{ appointment.ownerContactNumber }}</p>
+    <p><strong>Appointment Date:</strong> {{ appointment.appointmentDate }}</p>
+    <p><strong>Appointment Time:</strong> {{ appointment.appointmentTime }}</p>
+    <p><strong>Appointment Duration:</strong> {{ appointment.appointmentDuration }}</p>
+    <p><strong>Reason for Appointment:</strong> {{ appointment.reasonForAppointment }}</p>
+    <p><strong>Vet Notes:</strong> {{ appointment.vetNotes || 'Not provided' }}</p>
+  </div>
+  
+  <ng-template #loading>
+    <p>Loading appointment details...</p>
+  </ng-template>
+  
