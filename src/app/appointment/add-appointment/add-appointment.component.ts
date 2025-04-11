@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
 import { AppointmentAddDto } from '../appointment.model';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { futureDateTimeValidator } from '../appointment.model';
+import { futureAppointmentValidator } from '../../validators/appointment.validators';  // adjust the path as needed
 
 @Component({
   selector: 'app-add-appointment',
@@ -17,6 +17,11 @@ import { futureDateTimeValidator } from '../appointment.model';
 })
 export class AddAppointmentComponent implements OnInit {
   appointmentForm!: FormGroup;
+
+  // Simple getter to get the user role from localStorage (assumes window is defined)
+  get userRole(): string | null {
+    return window.localStorage.getItem('role');
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -37,21 +42,21 @@ export class AddAppointmentComponent implements OnInit {
       appointmentDuration: ['', Validators.required],
       reasonForAppointment: ['', Validators.required],
       vetNotes: ['']
-    });
+    }, { validators: futureAppointmentValidator }); 
+
+    // If the current user is a receptionist, disable the vetNotes field.
+    if (this.userRole === 'RECEPTIONIST') {
+      this.appointmentForm.get('vetNotes')?.disable();
+    }
   }
   
-
   submitForm(): void {
     if (this.appointmentForm.invalid) {
       return;
     }
     
-    
     const formValue = { ...this.appointmentForm.value };
-    
-    
-    console.log("Original form value:", formValue);
-    
+
     // Ensure appointmentDuration is a number.
     formValue.appointmentDuration = Number(formValue.appointmentDuration);
     
@@ -63,10 +68,10 @@ export class AddAppointmentComponent implements OnInit {
       }
     }
     
-    // Log the payload to verify the conversion.
+    // Log the payload for debugging.
     console.log("Payload to be sent:", formValue);
     
-    // Now send the payload to the backend. The API expects:
+    // The backend expects:
     // appointmentDate: "DD/MM/YYYY" and appointmentTime: "HH:MM"
     this.appointmentService.addAppointment(formValue)
       .subscribe(
@@ -84,8 +89,4 @@ export class AddAppointmentComponent implements OnInit {
         }
       );
   }
-  get userRole(): string | null {
-    return window.localStorage.getItem('role');
-  }
 }
-

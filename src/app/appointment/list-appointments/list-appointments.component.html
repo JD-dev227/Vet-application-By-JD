@@ -1,12 +1,13 @@
+<!-- src/app/appointment/list-appointments/list-appointments.component.html -->
 <div class="appointment-container">
   <h2>Appointment List</h2>
-
-  <!-- Export buttons are always visible -->
+  
+  <!-- Export Buttons available for all roles -->
   <div class="export-buttons">
     <button class="export-btn" (click)="exportExcel()">Export to Excel</button>
     <button class="export-btn" (click)="exportPDF()">Export to PDF</button>
   </div>
-
+  
   <table class="appointment-table">
     <thead>
       <tr>
@@ -37,12 +38,16 @@
           <button class="action-btn view" (click)="router.navigate(['/appointment', app.appointmentId])">
             View
           </button>
-          <!-- Only VET and ADMIN can update -->
-          <button *ngIf="(currentRole === 'VET' || currentRole === 'ADMIN')" class="action-btn update" (click)="router.navigate(['/update-appointment', app.appointmentId])">
+          <!-- Allow update for VET and ADMIN, and for RECEPTIONIST if the appointment is upcoming -->
+          <button *ngIf="(currentRole === 'VET' || currentRole === 'ADMIN' || (currentRole === 'RECEPTIONIST' && isUpcoming(app)))" 
+                  class="action-btn update" 
+                  (click)="router.navigate(['/update-appointment', app.appointmentId])">
             Update
           </button>
-          <!-- Only ADMIN can delete -->
-          <button *ngIf="currentRole === 'ADMIN'" class="action-btn delete" (click)="deleteAppointment(app.appointmentId)">
+          <!-- Only ADMIN can delete appointments -->
+          <button *ngIf="currentRole === 'ADMIN'" 
+                  class="action-btn delete" 
+                  (click)="deleteAppointment(app.appointmentId)">
             Delete
           </button>
         </td>

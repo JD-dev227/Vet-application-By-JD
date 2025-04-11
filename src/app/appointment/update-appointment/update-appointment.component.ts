@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppointmentService } from '../appointment.service';
-import { AppointmentAddDto } from '../appointment.model';
+import { AppointmentAddDto, AppointmentDto } from '../appointment.model';
 import Swal from 'sweetalert2';
+import { futureAppointmentValidator } from '../../validators/appointment.validators';  
 
 @Component({
   selector: 'app-update-appointment',
@@ -16,6 +17,12 @@ import Swal from 'sweetalert2';
 export class UpdateAppointmentComponent implements OnInit {
   appointmentForm!: FormGroup;
   appointmentId!: number;
+  appointmentData!: AppointmentDto;
+
+  // Getter for the current user role from localStorage.
+  get userRole(): string | null {
+    return window.localStorage.getItem('role');
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -38,11 +45,12 @@ export class UpdateAppointmentComponent implements OnInit {
       appointmentDuration: ['', Validators.required],
       reasonForAppointment: ['', Validators.required],
       vetNotes: ['']
-    });
+    }, { validators: futureAppointmentValidator }); 
 
     this.appointmentService.getAppointmentById(this.appointmentId).subscribe(
       data => {
-        // Patch the form with the retrieved data
+        this.appointmentData = data;
+        // Patch form values with retrieved appointment details.
         this.appointmentForm.patchValue({
           patientName: data.patientName,
           animalType: data.animalType,
@@ -56,11 +64,37 @@ export class UpdateAppointmentComponent implements OnInit {
           reasonForAppointment: data.reasonForAppointment,
           vetNotes: data.vetNotes
         });
+
+        
+        if (this.userRole === 'RECEPTIONIST') {
+          this.appointmentForm.get('vetNotes')?.disable();
+          
+          this.appointmentForm.get('ownerIdCardNumber')?.disable();
+
+          // Check if the appointment is upcoming; if not, prevent editing.
+          if (!this.isUpcoming(data)) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Permission Denied',
+              text: 'You can only edit upcoming appointments.'
+            });
+            this.router.navigate(['/appointments']);
+          }
+        }
       },
       error => {
         console.error('Error fetching appointment details', error);
       }
     );
+  }
+
+  // Helper method to check if an appointment is upcoming.
+  isUpcoming(appointment: AppointmentDto): boolean {
+    // Expected appointmentDate is "DD/MM/YYYY" and appointmentTime is "HH:MM".
+    const [day, month, year] = appointment.appointmentDate.split('/');
+    // Convert the appointmentDate and appointmentTime into an ISO-like string.
+    const appointmentDateTime = new Date(`${year}-${month}-${day}T${appointment.appointmentTime}:00`);
+    return appointmentDateTime > new Date();
   }
 
   onSubmit(): void {
@@ -69,16 +103,11 @@ export class UpdateAppointmentComponent implements OnInit {
     }
     const formValue = { ...this.appointmentForm.value };
     formValue.appointmentDuration = Number(formValue.appointmentDuration);
-    const payload: AppointmentAddDto = formValue;
 
-    this.appointmentService.updateAppointment(this.appointmentId, payload)
+    this.appointmentService.updateAppointment(this.appointmentId, formValue)
       .subscribe(() => {
         Swal.fire('Success', 'Appointment updated successfully', 'success');
         this.router.navigate(['/appointments']);
       });
-  }
-
-  get userRole(): string | null {
-    return window.localStorage.getItem('role');
   }
 }

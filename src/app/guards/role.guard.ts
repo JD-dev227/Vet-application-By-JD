@@ -15,7 +15,7 @@ export class RoleGuard implements CanActivate {
     if (expectedRoles.includes(this.userService.currentRole || '')) {
       return true;
     } else {
-      // Optionally navigate to a "not authorized" page or back to the appointment list.
+     
       this.router.navigate(['/appointments']);
       return false;
     }

@@ -1,4 +1,3 @@
-// src/app/appointment/list-appointments/list-appointments.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppointmentService } from '../appointment.service';
@@ -8,9 +7,7 @@ import { CommonModule } from '@angular/common';
 import { AppointmentStatusPipe } from '../../pipes/appointment-status.pipe';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
 import autoTable from 'jspdf-autotable';
-import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-list-appointments',
@@ -21,7 +18,7 @@ import { UserService } from '../../services/user.service';
 })
 export class ListAppointmentsComponent implements OnInit {
   appointments: AppointmentDto[] = [];
-  currentRole: string | null = localStorage.getItem('role');
+  currentRole: string | null = window.localStorage.getItem('role');
 
   constructor(public router: Router, private appointmentService: AppointmentService) {}
 
@@ -44,6 +41,14 @@ export class ListAppointmentsComponent implements OnInit {
         });
       }
     });
+  }
+
+  // Helper to check if an appointment is upcoming
+  isUpcoming(appointment: AppointmentDto): boolean {
+    // Suppose appointmentDate is in "DD/MM/YYYY" and appointmentTime "HH:MM"
+    const [day, month, year] = appointment.appointmentDate.split('/');
+    const appointmentDateTime = new Date(`${year}-${month}-${day}T${appointment.appointmentTime}:00`);
+    return appointmentDateTime > new Date();
   }
 
   deleteAppointment(id: number): void {
@@ -73,21 +78,18 @@ export class ListAppointmentsComponent implements OnInit {
     const doc = new jsPDF();
     const columns = ['ID', 'Patient Name', 'Animal Type', 'Owner Name', 'Owner Surname', 'Date', 'Time', 'Duration'];
     const rows = this.appointments.map(a => {
-      // Split the ISO date-time into date and time parts.
-      const [datePart, timePartRaw] = a.appointmentDate.split('T');
-      const timePart = timePartRaw ? timePartRaw.substring(0, 5) : '';
+      // Appointment date in "DD/MM/YYYY"; we assume appointmentTime is "HH:MM"
       return [
         a.appointmentId,
         a.patientName,
         a.animalType,
         a.ownerName,
         a.ownerSurname,
-        datePart,
-        timePart,
+        a.appointmentDate,
+        a.appointmentTime,
         a.appointmentDuration
       ];
     });
-    // Call autoTable as a function passing the doc and options.
     autoTable(doc, {
       head: [columns],
       body: rows

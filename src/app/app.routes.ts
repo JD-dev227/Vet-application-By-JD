@@ -12,5 +12,5 @@ export const routes: Routes = [
     path: 'add-appointment', 
     loadComponent: () => import('./appointment/add-appointment/add-appointment.component').then(m => m.AddAppointmentComponent) 
   },
-  // other routes...
+
 ];
